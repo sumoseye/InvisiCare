@@ -39,6 +39,7 @@ export interface PersonSkeleton {
   position: Point3D;
   rotation: number;
   animationPhase: number;
+  room: RoomType;
   isIntruder?: boolean;
   isFalling?: boolean;
   fallProgress?: number;

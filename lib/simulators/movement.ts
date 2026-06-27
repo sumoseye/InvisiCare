@@ -1,6 +1,6 @@
-import type { ActivityType, PersonID, Point3D, RoomType } from './types';
-import { PERSON_COLORS, ROOM_SIZE } from './constants';
-import { clamp, lerp, randomNoise } from './utils';
+import type { ActivityType, PersonID, Point3D, RoomType } from '../types';
+import { PERSON_COLORS, ROOM_SIZE } from '../constants';
+import { clamp, lerp } from '../utils';
 
 export interface PersonState {
   personId: PersonID;
@@ -46,7 +46,6 @@ const FURNITURE_BOUNDS = [
 let people: PersonState[] = [];
 let intruderActive = false;
 let intruderState: PersonState | null = null;
-let tick = 0;
 
 function createPerson(id: PersonID, startPos: Point3D, room: RoomType = 'living_room'): PersonState {
   return {
@@ -74,10 +73,6 @@ function initPeople() {
       createPerson('person-2', { x: 6.5, y: 0, z: 2.5 }, 'kitchen'),
     ];
   }
-}
-
-function isInBounds(p: Point3D): boolean {
-  return p.x > 0.5 && p.x < ROOM_SIZE.width - 0.5 && p.z > 0.5 && p.z < ROOM_SIZE.depth - 0.5;
 }
 
 function collidesWithFurniture(p: Point3D): boolean {
@@ -226,7 +221,6 @@ export function getIntruderState() {
 
 export function tickMovement(dt = 0.016) {
   initPeople();
-  tick += dt;
   people.forEach((p) => updatePersonPosition(p, dt));
   updateIntruder(dt);
 }

@@ -1,51 +1,72 @@
 'use client';
 
-import { ActivityBadge } from '@/components/visualizations/ActivityBadge';
-import { SkeletonRenderer } from '@/components/visualizations/SkeletonRenderer';
-import { useSkeletonStore } from '@/lib/store';
+import { useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
+import { VitalsPanel } from '@/components/cards/VitalsPanel';
+import { useSkeletonStore, useMovementStore } from '@/lib/store';
+
+const RoomRenderer = dynamic(
+  () =>
+    import('@/components/visualizations/RoomRenderer').then(
+      (m) => m.RoomRenderer
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex min-h-[400px] items-center justify-center rounded-xl border border-white/10 bg-slate-900/80">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-blue border-t-transparent" />
+      </div>
+    ),
+  }
+);
 
 export function PoseTracking() {
-  const { keypoints, activity, confidence, velocity } = useSkeletonStore();
+  const { setSkeletonResponse } = useSkeletonStore();
+  const { addPathPoint } = useMovementStore();
+  const people = useSkeletonStore((s) => Object.values(s.people));
+
+  const skeletonIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch skeleton data every 100ms for smooth animation
+  useEffect(() => {
+    if (skeletonIntervalRef.current) return;
+
+    skeletonIntervalRef.current = setInterval(async () => {
+      try {
+        const response = await fetch('/api/skeleton');
+        if (!response.ok) throw new Error('Failed to fetch skeleton');
+        const data = await response.json();
+
+        setSkeletonResponse(data.people);
+
+        // Add path points for each person
+        data.people.forEach(
+          (person: { personId: string; position: { x: number; y: number; z: number } }) => {
+            if (person.position) {
+              addPathPoint(person.personId, person.position);
+            }
+          }
+        );
+      } catch (error) {
+        console.error('Failed to fetch skeleton:', error);
+      }
+    }, 100);
+
+    return () => {
+      if (skeletonIntervalRef.current) {
+        clearInterval(skeletonIntervalRef.current);
+        skeletonIntervalRef.current = null;
+      }
+    };
+  }, [setSkeletonResponse, addPathPoint]);
 
   return (
-    <div className="space-y-6">
-      <div className="relative">
-        <div className="absolute right-4 top-4 z-10">
-          <ActivityBadge activity={activity} />
-        </div>
-        <SkeletonRenderer
-          keypoints={keypoints}
-          confidence={confidence}
-          velocity={velocity}
-        />
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
+      <div className="xl:col-span-3">
+        <RoomRenderer people={people} showTrails />
       </div>
-
-      <div className="mx-auto max-w-[600px]">
-        <p className="mb-2 text-sm font-medium text-slate-400">Movement Heatmap</p>
-        <div className="relative mx-auto h-[200px] w-[200px] overflow-hidden rounded-full border border-white/10 bg-slate-900/80">
-          <svg viewBox="0 0 200 200" className="h-full w-full">
-            <defs>
-              <radialGradient id="heatGrad">
-                <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#60a5fa" stopOpacity="0" />
-              </radialGradient>
-            </defs>
-            <circle cx="100" cy="100" r="90" fill="none" stroke="#334155" strokeWidth="1" />
-            {[0, 45, 90, 135].map((angle) => (
-              <line
-                key={angle}
-                x1="100"
-                y1="100"
-                x2={100 + 90 * Math.cos((angle * Math.PI) / 180)}
-                y2={100 + 90 * Math.sin((angle * Math.PI) / 180)}
-                stroke="#334155"
-                strokeWidth="0.5"
-              />
-            ))}
-            <circle cx="100" cy="100" r="40" fill="url(#heatGrad)" />
-            <circle cx={100 + (velocity > 0.3 ? 20 : 5)} cy="100" r="6" fill="#60a5fa" />
-          </svg>
-        </div>
+      <div className="xl:col-span-2">
+        <VitalsPanel className="min-h-[400px] xl:min-h-[500px]" />
       </div>
     </div>
   );

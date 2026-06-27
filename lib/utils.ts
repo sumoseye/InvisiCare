@@ -48,6 +48,17 @@ export function getConfidenceColor(confidence: number): string {
   return 'text-accent-red';
 }
 
+export function getSeverityBorderColor(severity: Severity): string {
+  switch (severity) {
+    case 'critical':
+      return 'hover:shadow-accent-red/10';
+    case 'warning':
+      return 'hover:shadow-accent-orange/10';
+    default:
+      return 'hover:shadow-accent-blue/10';
+  }
+}
+
 export function getSeverityColor(severity: Severity): string {
   switch (severity) {
     case 'critical':
@@ -99,22 +110,25 @@ export function filterEvents(
   filter: string,
   searchQuery: string,
   zone: string,
-  timeRangeMs: number
+  timeRangeMs: number,
+  personFilter = 'all'
 ): AppEvent[] {
   const now = Date.now();
   return events.filter((event) => {
     if (filter !== 'all' && event.severity !== filter) return false;
-    if (zone !== 'all' && event.location.toLowerCase().replace(/\s+/g, '-') !== zone && event.location !== zone) {
-      const zoneName = zone.replace(/-/g, ' ');
-      if (event.location.toLowerCase() !== zoneName.toLowerCase()) return false;
+    if (zone !== 'all') {
+      const slug = event.location.toLowerCase().replace(/\s+/g, '-');
+      if (slug !== zone && event.zone !== zone) return false;
     }
+    if (personFilter !== 'all' && !event.personIds.includes(personFilter)) return false;
     if (now - event.timestamp > timeRangeMs) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       return (
         event.message.toLowerCase().includes(q) ||
         event.location.toLowerCase().includes(q) ||
-        event.type.toLowerCase().includes(q)
+        event.type.toLowerCase().includes(q) ||
+        event.personIds.some((id) => id.includes(q))
       );
     }
     return true;
@@ -122,10 +136,10 @@ export function filterEvents(
 }
 
 export function exportEventsCSV(events: AppEvent[]): string {
-  const header = 'Timestamp,Severity,Description,Location,Confidence';
+  const header = 'Timestamp,Severity,Description,Zone,Person,Confidence';
   const rows = events.map(
     (e) =>
-      `"${formatDateTime(e.timestamp)}","${e.severity}","${e.message}","${e.location}",${(e.confidence * 100).toFixed(1)}%`
+      `"${formatDateTime(e.timestamp)}","${e.severity}","${e.message}","${e.location}","${e.personIds.join(';')}",${(e.confidence * 100).toFixed(1)}%`
   );
   return [header, ...rows].join('\n');
 }

@@ -35,7 +35,6 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-6">
         <div className="flex items-center gap-4">
           <h1 className="text-lg font-bold lg:text-xl">
-            <span className="mr-1">🌐</span>
             <span className="bg-gradient-to-r from-accent-blue via-accent-purple to-accent-green bg-clip-text text-transparent">
               WiFiSense Pro
             </span>

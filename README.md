@@ -9,8 +9,8 @@ A production-grade, full-stack WiFi-based spatial sensing dashboard built with N
 ## Features
 
 - **Real-time Dashboard** — Breathing rate, heart rate, occupancy, and CSI waveform visualization
-- **Pose Tracking** — 17-joint skeleton rendering with activity-based animations
-- **Intrusion Detection** — Zone monitoring, floor plan visualization, armed/disarmed controls
+- **Pose Tracking** — 3D room with procedural furniture, animated humanoid figures, movement trails, per-person vitals panel
+- **Intrusion Detection** — 3D intruder visualization, floor plan with multi-person dots, enhanced alert history
 - **Analytics** — Vital sign trends, occupancy patterns, activity breakdown, fall risk assessment
 - **Event Log** — Filterable event feed with CSV export and webhook configuration
 - **Glassmorphism UI** — Dark professional theme with Framer Motion animations
@@ -24,7 +24,9 @@ A production-grade, full-stack WiFi-based spatial sensing dashboard built with N
 | Styling | Tailwind CSS |
 | State | Zustand |
 | Charts | Recharts, Chart.js |
-| Animation | Framer Motion |
+| Animation | Framer Motion + Three.js |
+| 3D Graphics | Three.js (procedural room, humanoid, path trails) |
+| Icons | Heroicons (no emoji in UI labels) |
 | Database | PostgreSQL + Prisma (optional) |
 
 ## Getting Started

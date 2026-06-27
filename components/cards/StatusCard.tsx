@@ -1,17 +1,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import type { ReactNode } from 'react';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
-import {
-  LineChart,
-  Line,
-  ResponsiveContainer,
-  YAxis,
-} from 'recharts';
+import { Line, LineChart, ResponsiveContainer, YAxis } from 'recharts';
 
 interface StatusCardProps {
-  icon: string;
+  icon: ReactNode;
   label: string;
   value: string | number;
   color: string;
@@ -44,7 +40,7 @@ export function StatusCard({
         />
         <div className="relative space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-2xl">{icon}</span>
+            <span>{icon}</span>
             {status && <Badge variant={statusVariant}>{status}</Badge>}
           </div>
           <div>

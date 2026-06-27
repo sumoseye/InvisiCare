@@ -1,160 +1,175 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { ZoneCard } from '@/components/cards/ZoneCard';
-import { FloorPlan } from '@/components/visualizations/FloorPlan';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Dialog } from '@/components/ui/Dialog';
-import { Slider } from '@/components/ui/Slider';
-import { Toggle } from '@/components/ui/Toggle';
-import type { AppEvent, Zone } from '@/lib/types';
-import { useEventStore, useIntrusionStore } from '@/lib/store';
-import { formatDateTime } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useIntrusionStore, useEventStore, useAlertStore } from '@/lib/store';
+import { format } from 'date-fns';
 
 export function IntrusionDetection() {
-  const { armed, sensitivity, zones, lastIntrusion, setArmed, setSensitivity } =
-    useIntrusionStore();
-  const events = useEventStore((s) => s.events);
-  const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
-  const [filterZone, setFilterZone] = useState<string | null>(null);
+  const {
+    armed,
+    sensitivity,
+    zones,
+    lastIntrusion,
+    setArmed,
+    setSensitivity,
+    setZones,
+    setLastIntrusion,
+  } = useIntrusionStore();
 
-  const intrusionEvents = events.filter((e) => e.type === 'intrusion').slice(0, 10);
-  const hasAlert = zones.some((z) => z.status === 'alert');
+  const { addEvent } = useEventStore();
+  const { setAlert } = useAlertStore();
+
+  const zonesIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch zones data every 1 second
+  useEffect(() => {
+    if (zonesIntervalRef.current) return;
+
+    zonesIntervalRef.current = setInterval(async () => {
+      try {
+        const response = await fetch('/api/zones');
+        if (!response.ok) throw new Error('Failed to fetch zones');
+        const data = await response.json();
+        setZones(data.zones);
+      } catch (error) {
+        console.error('Failed to fetch zones:', error);
+      }
+    }, 1000);
+
+    return () => {
+      if (zonesIntervalRef.current) {
+        clearInterval(zonesIntervalRef.current);
+        zonesIntervalRef.current = null;
+      }
+    };
+  }, [setZones]);
+
+  // Handle intrusion events
+  useEffect(() => {
+    if (!armed) return;
+
+    // Simulate intrusion detection (in real app, this would come from API)
+    const randomIntrusion = Math.random() > 0.995; // 0.5% chance per second
+
+    if (randomIntrusion) {
+      const timestamp = Date.now();
+      setLastIntrusion(timestamp);
+
+      const event = {
+        id: `evt-${timestamp}`,
+        type: 'intrusion' as const,
+        severity: 'critical' as const,
+        description: 'Intrusion detected - Person at Entry Door',
+        personIds: ['intruder'],
+        zone: 'entry',
+        confidence: 0.96,
+        timestamp,
+        acknowledged: false,
+        status: 'active' as const,
+        message: 'Intrusion detected - Person at Entry Door',
+        location: 'entry',
+        dismissed: false,
+      };
+
+      addEvent(event);
+
+      setAlert({
+        id: `alert-${timestamp}`,
+        type: 'intrusion',
+        message: 'INTRUSION DETECTED - Person at Entry Door',
+        severity: 'critical',
+        timestamp,
+        location: 'entry',
+        confidence: 0.96,
+      });
+    }
+  }, [armed, setLastIntrusion, addEvent, setAlert]);
+
+  const timeAgoText =
+    lastIntrusion &&
+    `${Math.floor((Date.now() - lastIntrusion) / 1000)} seconds ago`;
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col items-center gap-6 lg:flex-row lg:justify-center">
-        <motion.div
-          className={`flex h-32 w-32 items-center justify-center rounded-full border-4 ${
-            hasAlert || (armed && hasAlert)
-              ? 'border-accent-red bg-accent-red/10'
-              : armed
-                ? 'border-accent-green bg-accent-green/10'
-                : 'border-slate-600 bg-slate-800/50'
-          }`}
-          animate={hasAlert ? { scale: [1, 1.05, 1] } : {}}
-          transition={{ duration: 1, repeat: Infinity }}
-        >
-          <span
-            className={`text-xl font-bold ${
-              hasAlert ? 'text-accent-red' : armed ? 'text-accent-green' : 'text-slate-400'
+      {/* Security Status Panel */}
+      <div className="rounded-xl border border-white/10 bg-slate-900/50 p-8 backdrop-blur">
+        <div className="mb-6 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-white">Security Status</h3>
+          <div
+            className={`inline-flex items-center rounded-full px-4 py-2 font-semibold ${
+              armed
+                ? 'bg-red-500/20 text-red-400'
+                : 'bg-green-500/20 text-green-400'
             }`}
           >
-            {hasAlert ? 'ALERT' : armed ? 'SECURE' : 'OFF'}
-          </span>
-        </motion.div>
-
-        <Card className="w-full max-w-md">
-          <CardContent className="space-y-4 pt-6">
-            <Toggle checked={armed} onChange={setArmed} label="Security System" />
-            <Slider value={sensitivity} onChange={setSensitivity} label="Detection Sensitivity" />
-            {lastIntrusion && (
-              <p className="text-sm text-slate-400">
-                Last intrusion: {formatDateTime(lastIntrusion)}
-              </p>
-            )}
-            <Button variant="secondary" size="sm" onClick={() => setArmed(false)}>
-              Reset / Clear
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {zones.map((zone) => (
-          <ZoneCard key={zone.id} zone={zone} onClick={() => setSelectedZone(zone)} />
-        ))}
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>24-Hour Intrusion Timeline</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="relative h-16 overflow-x-auto">
-            <div className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-slate-700" />
-            {['12am', '6am', '12pm', '6pm', '12am'].map((label, i) => (
-              <div
-                key={label}
-                className="absolute top-0 text-xs text-slate-500"
-                style={{ left: `${i * 25}%` }}
-              >
-                {label}
-              </div>
-            ))}
-            {intrusionEvents.map((event, i) => (
-              <div
-                key={event.id}
-                className="absolute top-1/2 h-8 w-1 -translate-y-1/2 cursor-pointer bg-accent-red"
-                style={{ left: `${10 + (i * 15) % 80}%` }}
-                title={`${event.message} — ${formatDateTime(event.timestamp)}`}
-              />
-            ))}
+            <div
+              className={`mr-2 h-2 w-2 rounded-full animate-pulse ${
+                armed ? 'bg-red-400' : 'bg-green-400'
+              }`}
+            />
+            {armed ? 'ARMED' : 'DISARMED'}
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Live Floor Plan</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <FloorPlan
-            zones={zones}
-            selectedZone={filterZone}
-            onZoneClick={(zone) => setFilterZone(zone.slug || null)}
-          />
-        </CardContent>
-      </Card>
+        {/* Toggle Armed State */}
+        <div className="mb-6 flex items-center justify-between">
+          <label className="text-sm text-gray-300">Arm System</label>
+          <button
+            onClick={() => setArmed(!armed)}
+            className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors ${
+              armed ? 'bg-red-500' : 'bg-slate-600'
+            }`}
+          >
+            <span
+              className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                armed ? 'translate-x-9' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Alert History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="max-h-[300px] space-y-2 overflow-y-auto scrollbar-thin">
-            {intrusionEvents.length === 0 ? (
-              <p className="text-sm text-slate-500">No recent intrusion events</p>
-            ) : (
-              intrusionEvents.map((event) => (
-                <IntrusionEventRow key={event.id} event={event} />
-              ))
-            )}
+        {/* Sensitivity Slider */}
+        <div className="mb-4">
+          <label className="text-sm text-gray-300">Sensitivity</label>
+          <div className="mt-2 flex items-center gap-4">
+            <input
+              type="range"
+              min="0"
+              max="2"
+              value={{ low: 0, medium: 1, high: 2 }[sensitivity]}
+              onChange={(e) => {
+                const levels: Array<'low' | 'medium' | 'high'> = [
+                  'low',
+                  'medium',
+                  'high',
+                ];
+                setSensitivity(levels[Number(e.target.value)]);
+              }}
+              className="flex-1"
+            />
+            <span className="min-w-16 text-sm font-medium capitalize text-accent-blue">
+              {sensitivity}
+            </span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <Dialog
-        open={!!selectedZone}
-        onClose={() => setSelectedZone(null)}
-        title={selectedZone?.name || 'Zone Details'}
-      >
-        {selectedZone && (
-          <div className="space-y-2 text-sm text-slate-300">
-            <p>Status: <span className="capitalize text-white">{selectedZone.status}</span></p>
-            <p>Motion Intensity: {selectedZone.motionIntensity}%</p>
-            <p>Last Activity: {formatDateTime(selectedZone.lastActivity)}</p>
-          </div>
+        {/* Last Intrusion */}
+        {lastIntrusion && (
+          <p className="text-sm text-gray-400">
+            Last alert: <span className="font-semibold">{timeAgoText}</span>
+          </p>
         )}
-      </Dialog>
-    </div>
-  );
-}
-
-function IntrusionEventRow({ event }: { event: AppEvent }) {
-  return (
-    <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/5 p-3">
-      <div>
-        <p className="text-sm font-medium text-white">{event.message}</p>
-        <p className="text-xs text-slate-500">
-          {formatDateTime(event.timestamp)} · {(event.confidence * 100).toFixed(1)}%
-        </p>
       </div>
-      <div className="flex gap-2">
-        <Button variant="outline" size="sm">View</Button>
-        <Button variant="ghost" size="sm">Dismiss</Button>
+
+      {/* Zone Grid */}
+      <div>
+        <h3 className="mb-4 text-lg font-semibold text-white">Zone Monitoring</h3>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {zones.map((zone, index) => (
+            <ZoneCard key={zone.id} zone={zone} />
+          ))}
+        </div>
       </div>
     </div>
   );
