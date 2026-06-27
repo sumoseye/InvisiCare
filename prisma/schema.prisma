@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id         String   @id @default(cuid())
+  type       String
+  severity   String
+  message    String
+  location   String
+  confidence Float
+  timestamp  DateTime @default(now())
+  resolved   Boolean  @default(false)
+}
+
+model VitalSign {
+  id          String   @id @default(cuid())
+  breathing   Float
+  heartRate   Float
+  personCount Int
+  activity    String
+  timestamp   DateTime @default(now())
+}
+
+model Zone {
+  id              String    @id @default(cuid())
+  name            String
+  status          String
+  lastActivity    DateTime?
+  motionIntensity Int
+}
