@@ -5,12 +5,14 @@ import {
   useAlertStore,
   useAnalyticsStore,
   useEventStore,
-  useIntrusionStore,
   useMovementStore,
   useSkeletonStore,
   useVitalsStore,
   useWaveformStore,
+  useRoomStore,
 } from '@/lib/store';
+import { usePoseStore } from '@/lib/usePoseStore';
+import { useFallStore } from '@/lib/useFallStore';
 import { calcFallRisk } from '@/lib/utils';
 import { generateOccupancyData, generatePersonTrendData } from '@/lib/simulators/events';
 
@@ -21,13 +23,26 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const setEvents = useEventStore((s) => s.setEvents);
   const setAlert = useAlertStore((s) => s.setAlert);
   const addPathPoint = useMovementStore((s) => s.addPathPoint);
-  const { armed, sensitivity, setZones, setLastIntrusion, setIntruders } = useIntrusionStore();
   const { updateHistoricalVitals, updatePersonMetrics, setOccupancyData, setFallRisk } =
     useAnalyticsStore();
+  const selectedRoom = useRoomStore((s) => s.selectedRoom);
+  const resetPose = usePoseStore((s) => s.resetPose);
+  const resetFall = useFallStore((s) => s.resetFall);
+  const resetVitals = useVitalsStore((s) => s.resetVitals);
+  const resetSkeleton = useSkeletonStore((s) => s.resetSkeleton);
+  const resetWaveform = useWaveformStore((s) => s.resetWaveform);
+
+  useEffect(() => {
+    resetVitals();
+    resetSkeleton();
+    resetWaveform();
+    resetPose();
+    resetFall();
+  }, [selectedRoom, resetVitals, resetSkeleton, resetWaveform, resetPose, resetFall]);
 
   useEffect(() => {
     setOccupancyData(generateOccupancyData());
-    ['person-1', 'person-2'].forEach((id) => {
+    ['person-1'].forEach((id) => {
       generatePersonTrendData(id, 60).forEach((point) => updatePersonMetrics(id, point));
     });
     generatePersonTrendData('person-1', 60).forEach((point) => updateHistoricalVitals(point));
@@ -35,7 +50,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const fetchVitals = async () => {
-      const res = await fetch('/api/vitals');
+      const res = await fetch(`/api/vitals?room=${selectedRoom}`);
       const data = await res.json();
       setVitalsResponse(data);
 
@@ -66,8 +81,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         );
       }
 
-      const intruders = data.people?.filter((p: { isIntruder?: boolean }) => p.isIntruder).map((p: { personId: string }) => p.personId) || [];
-      setIntruders(intruders);
+
 
       if (data.fall_detected) {
         setAlert({
@@ -85,36 +99,35 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     fetchVitals();
     const id = setInterval(fetchVitals, 1000);
     return () => clearInterval(id);
-  }, [setVitalsResponse, updateHistoricalVitals, updatePersonMetrics, setFallRisk, setAlert, addPathPoint, setIntruders]);
+  }, [selectedRoom, setVitalsResponse, updateHistoricalVitals, updatePersonMetrics, setFallRisk, setAlert, addPathPoint]);
 
   useEffect(() => {
     const fetchSkeleton = async () => {
-      const res = await fetch('/api/skeleton');
+      const res = await fetch(`/api/skeleton?room=${selectedRoom}`);
       const data = await res.json();
       setSkeletonResponse(data.people || []);
     };
     fetchSkeleton();
     const id = setInterval(fetchSkeleton, 100);
     return () => clearInterval(id);
-  }, [setSkeletonResponse]);
+  }, [selectedRoom, setSkeletonResponse]);
 
   useEffect(() => {
     const fetchWaveform = async () => {
-      const res = await fetch('/api/waveform');
+      const res = await fetch(`/api/waveform?room=${selectedRoom}`);
       const data = await res.json();
       setWaveform(data.waveform);
     };
     fetchWaveform();
     const id = setInterval(fetchWaveform, 500);
     return () => clearInterval(id);
-  }, [setWaveform]);
+  }, [selectedRoom, setWaveform]);
 
   useEffect(() => {
     const fetchEvents = async () => {
       const params = new URLSearchParams({
         filter: 'all',
-        armed: String(armed),
-        sensitivity,
+        room: selectedRoom,
       });
       const res = await fetch(`/api/events?${params}`);
       const data = await res.json();
@@ -122,13 +135,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
       const critical = data.events.find(
         (e: { severity: string; type: string; acknowledged?: boolean }) =>
-          e.severity === 'critical' && e.type === 'intrusion' && !e.acknowledged
+          e.severity === 'critical' && e.type === 'fall' && !e.acknowledged
       );
-      if (critical && armed) {
-        setLastIntrusion(critical.timestamp);
+      if (critical) {
         setAlert({
           id: critical.id,
-          type: 'intrusion',
+          type: 'fall',
           severity: 'critical',
           message: critical.message,
           location: critical.location,
@@ -140,19 +152,19 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     fetchEvents();
     const id = setInterval(fetchEvents, 2000);
     return () => clearInterval(id);
-  }, [armed, sensitivity, setEvents, setAlert, setLastIntrusion]);
+  }, [selectedRoom, setEvents, setAlert]);
 
   useEffect(() => {
     const fetchZones = async () => {
-      const params = new URLSearchParams({ armed: String(armed), sensitivity });
-      const res = await fetch(`/api/zones?${params}`);
-      const data = await res.json();
-      setZones(data.zones);
+      // const params = new URLSearchParams({});
+      // const res = await fetch(`/api/zones?${params}`);
+      // const data = await res.json();
+      // setZones(data.zones);
     };
     fetchZones();
     const id = setInterval(fetchZones, 1000);
     return () => clearInterval(id);
-  }, [armed, sensitivity, setZones]);
+  }, []);
 
   return <>{children}</>;
 }

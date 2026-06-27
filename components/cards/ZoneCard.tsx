@@ -43,7 +43,9 @@ export function ZoneCard({ zone, onClick }: ZoneCardProps) {
           </div>
           <div className={`h-3 w-3 rounded-full ${statusColors[zone.status]}`} />
         </div>
-        <p className="mt-2 text-xs text-slate-400">{zone.occupancyCount ?? 0} person(s) detected</p>
+        <p className="mt-2 text-xs text-slate-400">
+          {zone.occupancyCount ?? 0} occupant{(zone.occupancyCount ?? 0) === 1 ? '' : 's'} detected
+        </p>
         <div className="mt-3">
           <div className="mb-1 flex justify-between text-xs text-slate-400">
             <span>Motion</span>

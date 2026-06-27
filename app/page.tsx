@@ -3,11 +3,10 @@
 import { AlertBanner } from '@/components/layout/AlertBanner';
 import { Header } from '@/components/layout/Header';
 import { DataProvider } from '@/components/DataProvider';
-import { Analytics } from '@/components/tabs/Analytics';
-import { Dashboard } from '@/components/tabs/Dashboard';
-import { EventLog } from '@/components/tabs/EventLog';
-import { IntrusionDetection } from '@/components/tabs/IntrusionDetection';
-import { PoseTracking } from '@/components/tabs/PoseTracking';
+import { OverviewTab } from '@/components/tabs/OverviewTab';
+import { VitalsTab } from '@/components/tabs/VitalsTab';
+import { PoseDetectionTab } from '@/components/tabs/PoseDetectionTab';
+import { FallDetectionTab } from '@/components/tabs/FallDetectionTab';
 import { useAppStore } from '@/lib/store';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -15,11 +14,10 @@ function TabContent() {
   const activeTab = useAppStore((s) => s.activeTab);
 
   const tabs: Record<string, React.ReactNode> = {
-    dashboard: <Dashboard />,
-    pose: <PoseTracking />,
-    intrusion: <IntrusionDetection />,
-    analytics: <Analytics />,
-    events: <EventLog />,
+    overview: <OverviewTab />,
+    vitals: <VitalsTab />,
+    pose: <PoseDetectionTab />,
+    fall: <FallDetectionTab />,
   };
 
   return (

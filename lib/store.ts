@@ -13,14 +13,11 @@ import type {
   PersonSkeleton,
   PersonVitals,
   RoomType,
-  Sensitivity,
   TimeRange,
   VitalHistoryPoint,
   VitalsResponse,
-  Zone,
   ActivityDistribution,
 } from './types';
-import { ZONES } from './constants';
 
 // ============ VITALS STORE ============
 interface VitalsStore {
@@ -39,6 +36,7 @@ interface VitalsStore {
   updatePerson: (id: PersonID, vitals: Partial<PersonVitals>) => void;
   getPersonCount: () => number;
   getPeopleList: () => PersonVitals[];
+  resetVitals: () => void;
 }
 
 export const useVitalsStore = create<VitalsStore>((set, get) => ({
@@ -103,6 +101,20 @@ export const useVitalsStore = create<VitalsStore>((set, get) => ({
 
   getPeopleList: () =>
     Object.values(get().people).filter((p) => !p.isIntruder),
+
+  resetVitals: () =>
+    set({
+      people: {},
+      breathing: 0,
+      heartRate: 0,
+      personCount: 0,
+      activity: 'standing',
+      presenceConfidence: 0,
+      signalStrength: 0,
+      breathingHistory: [],
+      heartRateHistory: [],
+      activityDuration: 0,
+    }),
 }));
 
 // ============ SKELETON STORE ============
@@ -110,6 +122,7 @@ interface SkeletonStore {
   people: Record<PersonID, PersonSkeleton>;
   setSkeletonResponse: (people: PersonSkeleton[]) => void;
   getActivePeople: () => PersonSkeleton[];
+  resetSkeleton: () => void;
 }
 
 export const useSkeletonStore = create<SkeletonStore>((set, get) => ({
@@ -124,21 +137,23 @@ export const useSkeletonStore = create<SkeletonStore>((set, get) => ({
   },
 
   getActivePeople: () => Object.values(get().people),
+
+  resetSkeleton: () => set({ people: {} }),
 }));
 
 // ============ ROOM STORE ============
 interface RoomStore {
   currentRoom: RoomType;
   setCurrentRoom: (room: RoomType) => void;
-  focusedPersonId: PersonID | null;
-  setFocusedPersonId: (id: PersonID | null) => void;
+  selectedRoom: string;
+  setSelectedRoom: (room: string) => void;
 }
 
 export const useRoomStore = create<RoomStore>((set) => ({
   currentRoom: 'living_room',
   setCurrentRoom: (room) => set({ currentRoom: room }),
-  focusedPersonId: null,
-  setFocusedPersonId: (id) => set({ focusedPersonId: id }),
+  selectedRoom: '1',
+  setSelectedRoom: (room) => set({ selectedRoom: room }),
 }));
 
 // ============ MOVEMENT STORE ============
@@ -174,41 +189,6 @@ export const useMovementStore = create<MovementStore>((set) => ({
       set({ pathTrails: {} });
     }
   },
-}));
-
-// ============ INTRUSION STORE ============
-interface IntrusionStore {
-  armed: boolean;
-  sensitivity: Sensitivity;
-  zones: Zone[];
-  lastIntrusion: number | null;
-  intruders: PersonID[];
-  setArmed: (armed: boolean) => void;
-  setSensitivity: (sensitivity: Sensitivity) => void;
-  setZones: (zones: Zone[]) => void;
-  updateZone: (index: number, zone: Zone) => void;
-  setLastIntrusion: (timestamp: number | null) => void;
-  setIntruders: (ids: PersonID[]) => void;
-}
-
-export const useIntrusionStore = create<IntrusionStore>((set) => ({
-  armed: false,
-  sensitivity: 'medium',
-  zones: ZONES,
-  lastIntrusion: null,
-  intruders: [],
-
-  setArmed: (armed) => set({ armed }),
-  setSensitivity: (sensitivity) => set({ sensitivity }),
-  setZones: (zones) => set({ zones }),
-
-  updateZone: (index, zone) =>
-    set((state) => ({
-      zones: state.zones.map((z, i) => (i === index ? zone : z)),
-    })),
-
-  setLastIntrusion: (timestamp) => set({ lastIntrusion: timestamp }),
-  setIntruders: (ids) => set({ intruders: ids }),
 }));
 
 // ============ EVENT STORE ============
@@ -369,11 +349,13 @@ export const useAnalyticsStore = create<AnalyticsStore>((set) => ({
 interface WaveformStore {
   waveform: number[];
   setWaveform: (waveform: number[]) => void;
+  resetWaveform: () => void;
 }
 
 export const useWaveformStore = create<WaveformStore>((set) => ({
   waveform: Array(50).fill(100),
   setWaveform: (waveform) => set({ waveform }),
+  resetWaveform: () => set({ waveform: Array(50).fill(100) }),
 }));
 
 // ============ APP STORE ============
@@ -383,6 +365,6 @@ interface AppStore {
 }
 
 export const useAppStore = create<AppStore>((set) => ({
-  activeTab: 'dashboard',
+  activeTab: 'overview',
   setActiveTab: (tab) => set({ activeTab: tab }),
 }));

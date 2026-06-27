@@ -47,7 +47,6 @@ function seedEvents() {
   const now = Date.now();
   events = [
     createEvent('occupancy_change', 'info', 'Person entered Living Room', 'Living Room', 0.94, ['person-1']),
-    createEvent('activity_change', 'info', 'Person 2 transitioned to Walking activity', 'Kitchen', 0.91, ['person-2']),
     createEvent('anomaly', 'warning', 'Elevated heart rate detected - Person 1', 'Living Room', 0.87, ['person-1']),
     createEvent('occupancy_change', 'info', 'Person left Bedroom', 'Bedroom', 0.96, []),
     createEvent('motion', 'info', 'Motion detected in Hallway', 'Hallway', 0.89, []),
@@ -229,14 +228,14 @@ export function getZones(): Zone[] {
 export function generateOccupancyData() {
   return Array.from({ length: 24 }, (_, hour) => {
     const peak = hour >= 8 && hour <= 22;
-    const count = peak ? Math.floor(Math.random() * 3) + 1 : Math.floor(Math.random() * 2);
+    const count = peak ? Math.floor(Math.random() * 2) : Math.floor(Math.random() * 2);
     return { hour, count, label: `${hour}:00` };
   });
 }
 
 export function generateTrendData(points = 60, personId?: string) {
   const now = Date.now();
-  const offset = personId === 'person-2' ? 2 : personId === 'person-3' ? -1 : 0;
+  const offset = personId === 'person-1' ? 0 : 0;
   return Array.from({ length: points }, (_, i) => {
     const t = i / points;
     return {

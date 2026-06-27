@@ -1,8 +1,8 @@
-# WiFiSense Pro
+# InvisiCare
 
 A production-grade, full-stack WiFi-based spatial sensing dashboard built with Next.js 14. Monitor vital signs, track human pose, detect intrusions, and analyze occupancy patterns — all simulated through WiFi CSI (Channel State Information) signal analysis.
 
-![WiFiSense Pro](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
+![InvisiCare](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?style=flat-square&logo=tailwindcss)
 
@@ -40,7 +40,7 @@ A production-grade, full-stack WiFi-based spatial sensing dashboard built with N
 
 ```bash
 git clone <your-repo-url>
-cd wifisense-pro
+cd invisicare
 npm install
 ```
 
@@ -88,7 +88,7 @@ npx prisma db push
 ## Project Structure
 
 ```
-wifisense-pro/
+invisicare/
 ├── app/                  # Next.js App Router pages & API routes
 ├── components/
 │   ├── layout/           # Header, Navigation, AlertBanner

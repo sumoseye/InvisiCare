@@ -1,8 +1,9 @@
 'use client';
 
+import { useMemo } from 'react';
 import { ACTIVITY_LABELS, PERSON_LABELS } from '@/lib/constants';
-import type { PersonID, PersonVitals } from '@/lib/types';
-import { useRoomStore, useVitalsStore } from '@/lib/store';
+import type { PersonVitals } from '@/lib/types';
+import { useVitalsStore } from '@/lib/store';
 import { cn, getConfidenceColor, isBreathingNormal, isHeartRateNormal } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import {
@@ -98,10 +99,10 @@ function PersonVitalCard({
 }
 
 export function VitalsPanel({ className = '' }: VitalsPanelProps) {
-  const people = useVitalsStore((s) => Object.values(s.people));
-  const legit = people.filter((p) => !p.isIntruder);
+  const peopleMap = useVitalsStore((s) => s.people);
+  const people = useMemo(() => Object.values(peopleMap), [peopleMap]);
+  const monitoredPerson = people.find((p) => !p.isIntruder) || null;
   const intruders = people.filter((p) => p.isIntruder);
-  const { focusedPersonId, setFocusedPersonId } = useRoomStore();
 
   return (
     <div
@@ -112,33 +113,20 @@ export function VitalsPanel({ className = '' }: VitalsPanelProps) {
     >
       <div className="mb-4 border-b border-white/10 pb-4">
         <h3 className="text-lg font-semibold text-white">Active Monitoring</h3>
-        <p className="text-sm text-slate-400">
-          {legit.length} {legit.length === 1 ? 'Person' : 'People'} Detected
-        </p>
+        <p className="text-sm text-slate-400">Single-resident mode</p>
       </div>
 
       <div className="flex-1 space-y-3 overflow-y-auto scrollbar-thin">
-        {legit.map((person) => (
-          <PersonVitalCard
-            key={person.personId}
-            person={person}
-            isFocused={focusedPersonId === person.personId}
-            onFocus={() =>
-              setFocusedPersonId(
-                focusedPersonId === person.personId ? null : (person.personId as PersonID)
-              )
-            }
-          />
-        ))}
+        {monitoredPerson && <PersonVitalCard person={monitoredPerson} isFocused={true} onFocus={() => {}} />}
         {intruders.map((person) => (
           <PersonVitalCard
             key={person.personId}
             person={person}
-            isFocused={focusedPersonId === person.personId}
-            onFocus={() => setFocusedPersonId(person.personId as PersonID)}
+            isFocused={false}
+            onFocus={() => {}}
           />
         ))}
-        {people.length === 0 && (
+        {!monitoredPerson && intruders.length === 0 && (
           <p className="py-8 text-center text-sm text-slate-500">Waiting for sensor data...</p>
         )}
       </div>

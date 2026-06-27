@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { TABS } from '@/lib/constants';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, useRoomStore } from '@/lib/store';
 import { Badge } from '../ui/Badge';
 import { Navigation } from './Navigation';
 
@@ -12,6 +12,7 @@ export function Header() {
   const [time, setTime] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
   const activeTab = useAppStore((s) => s.activeTab);
+  const { selectedRoom, setSelectedRoom } = useRoomStore();
 
   useEffect(() => {
     const update = () =>
@@ -36,7 +37,7 @@ export function Header() {
         <div className="flex items-center gap-4">
           <h1 className="text-lg font-bold lg:text-xl">
             <span className="bg-gradient-to-r from-accent-blue via-accent-purple to-accent-green bg-clip-text text-transparent">
-              WiFiSense Pro
+              InvisiCare
             </span>
           </h1>
           <div className="hidden items-center gap-2 md:flex">
@@ -58,6 +59,14 @@ export function Header() {
           <Badge variant="success" className="hidden sm:inline-flex">
             System Active
           </Badge>
+          <select
+            value={selectedRoom}
+            onChange={(e) => setSelectedRoom(e.target.value)}
+            className="rounded-md border border-white/10 bg-dark/50 px-3 py-1.5 text-sm font-medium text-white shadow-sm focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue sm:text-sm"
+          >
+            <option value="1">Room 1</option>
+            <option value="2">Room 2</option>
+          </select>
           <button
             className="rounded-lg p-2 text-slate-400 hover:bg-white/5 lg:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}

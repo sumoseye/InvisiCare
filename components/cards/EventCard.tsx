@@ -75,7 +75,9 @@ export function EventCard({
                 {(event.confidence * 100).toFixed(1)}% confidence
               </p>
               {event.personIds.length > 0 && (
-                <p className="text-xs text-slate-600">People: {event.personIds.join(', ')}</p>
+                <p className="text-xs text-slate-600">
+                  Person: {event.personIds.join(', ')}
+                </p>
               )}
               <span className={`mt-1 inline-block rounded px-2 py-0.5 text-xs ${
                 event.status === 'acknowledged' ? 'bg-slate-700 text-slate-300' :

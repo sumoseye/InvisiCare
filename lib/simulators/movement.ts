@@ -50,7 +50,7 @@ let intruderState: PersonState | null = null;
 function createPerson(id: PersonID, startPos: Point3D, room: RoomType = 'living_room'): PersonState {
   return {
     personId: id,
-    label: id === 'person-1' ? 'Person 1' : id === 'person-2' ? 'Person 2' : 'Person 3',
+    label: 'Person 1',
     color: PERSON_COLORS[id] || '#5a6b7a',
     activity: 'standing',
     position: { ...startPos },
@@ -68,10 +68,7 @@ function createPerson(id: PersonID, startPos: Point3D, room: RoomType = 'living_
 
 function initPeople() {
   if (people.length === 0) {
-    people = [
-      createPerson('person-1', { x: 4, y: 0, z: 4 }),
-      createPerson('person-2', { x: 6.5, y: 0, z: 2.5 }, 'kitchen'),
-    ];
+    people = [createPerson('person-1', { x: 4, y: 0, z: 4 })];
   }
 }
 
@@ -235,7 +232,7 @@ export function getAllPeopleStates(): PersonState[] {
 
 export function getPersonCount(): number {
   initPeople();
-  return people.length;
+  return people.length > 0 ? 1 : 0;
 }
 
 export function triggerFall(personId: PersonID) {
@@ -249,11 +246,9 @@ export function triggerFall(personId: PersonID) {
 
 export function setPersonCount(count: number) {
   initPeople();
-  while (people.length < count && people.length < 3) {
-    const id = `person-${people.length + 1}` as PersonID;
-    people.push(createPerson(id, { x: 3 + people.length, y: 0, z: 3 + people.length }));
+  if (count <= 0) {
+    people = [];
+    return;
   }
-  while (people.length > count) {
-    people.pop();
-  }
+  people = people.length > 0 ? [people[0]] : [createPerson('person-1', { x: 4, y: 0, z: 4 })];
 }

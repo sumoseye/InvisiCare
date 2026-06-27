@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, Suspense } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type { PersonSkeleton } from '@/lib/types';
 import { useMovementStore } from '@/lib/store';
@@ -16,15 +16,21 @@ export function RoomRenderer({ people, showTrails = true }: RoomRendererProps) {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.Camera | null>(null);
   const animationIdRef = useRef<number | null>(null);
+  const peopleRef = useRef<PersonSkeleton[]>(people);
   const peopleGroupsRef = useRef<Map<string, THREE.Group>>(new Map());
   const trailLinesRef = useRef<Map<string, THREE.Line>>(new Map());
   const initializingRef = useRef(false);
 
   const pathTrails = useMovementStore((s) => s.pathTrails);
 
+  useEffect(() => {
+    peopleRef.current = people;
+  }, [people]);
+
   // Initialize Three.js scene (only once)
   useEffect(() => {
-    if (initializingRef.current || !containerRef.current) return;
+    const container = containerRef.current;
+    if (initializingRef.current || !container) return;
     initializingRef.current = true;
 
     try {
@@ -34,8 +40,8 @@ export function RoomRenderer({ people, showTrails = true }: RoomRendererProps) {
       sceneRef.current = scene;
 
       // Camera setup
-      const width = containerRef.current.clientWidth;
-      const height = containerRef.current.clientHeight;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
       const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
       camera.position.set(5, 4, 5);
       camera.lookAt(0, 0, 0);
@@ -46,7 +52,7 @@ export function RoomRenderer({ people, showTrails = true }: RoomRendererProps) {
       renderer.setSize(width, height);
       renderer.shadowMap.enabled = true;
       renderer.setPixelRatio(window.devicePixelRatio);
-      containerRef.current.appendChild(renderer.domElement);
+      container.appendChild(renderer.domElement);
       rendererRef.current = renderer;
 
       // Lighting
@@ -68,7 +74,7 @@ export function RoomRenderer({ people, showTrails = true }: RoomRendererProps) {
         animationIdRef.current = requestAnimationFrame(animate);
 
         // Update people positions
-        people.forEach((person) => {
+        peopleRef.current.forEach((person) => {
           if (peopleGroupsRef.current.has(person.personId)) {
             const group = peopleGroupsRef.current.get(person.personId)!;
             if (person.position) {
@@ -95,7 +101,7 @@ export function RoomRenderer({ people, showTrails = true }: RoomRendererProps) {
         const w = containerRef.current.clientWidth;
         const h = containerRef.current.clientHeight;
         (cameraRef.current as THREE.PerspectiveCamera).aspect = w / h;
-        cameraRef.current.updateProjectionMatrix();
+        (cameraRef.current as THREE.PerspectiveCamera).updateProjectionMatrix();
         rendererRef.current.setSize(w, h);
       };
 
@@ -108,10 +114,10 @@ export function RoomRenderer({ people, showTrails = true }: RoomRendererProps) {
           cancelAnimationFrame(animationIdRef.current);
         }
         if (
-          containerRef.current &&
-          rendererRef.current?.domElement?.parentElement === containerRef.current
+          container &&
+          rendererRef.current?.domElement?.parentElement === container
         ) {
-          containerRef.current.removeChild(rendererRef.current.domElement);
+          container.removeChild(rendererRef.current.domElement);
         }
         renderer.dispose();
       };

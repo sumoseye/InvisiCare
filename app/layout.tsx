@@ -5,7 +5,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'WiFiSense Pro — WiFi Spatial Sensing Dashboard',
+  title: 'InvisiCare',
   description:
     'Real-time monitoring system using WiFi CSI signal analysis to detect people, monitor vital signs, track movement, and alert on emergencies.',
 };

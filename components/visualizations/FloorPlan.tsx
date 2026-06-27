@@ -59,7 +59,7 @@ export function FloorPlan({ zones, people = [], selectedZone, onZoneClick }: Flo
         })}
         {people.map((p) => {
           const pos = ROOM_POSITION_MAP[p.room] || { cx: 300, cy: 160 };
-          const offset = p.personId === 'person-2' ? 15 : p.personId === 'intruder' ? -15 : 0;
+          const offset = p.isIntruder ? -15 : 0;
           const color = p.isIntruder ? PERSON_COLORS.intruder : p.color;
           return (
             <motion.circle
