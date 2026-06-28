@@ -3,15 +3,15 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-blue/70 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        primary: 'bg-accent-blue text-white hover:bg-blue-500 shadow-lg shadow-accent-blue/20',
-        secondary: 'bg-white/10 text-white hover:bg-white/20 border border-white/10',
-        outline: 'border border-accent-blue/40 text-accent-blue hover:bg-accent-blue/10',
-        ghost: 'text-slate-300 hover:bg-white/5 hover:text-white',
-        danger: 'bg-accent-red text-white hover:bg-red-600',
+        primary: 'bg-accent-blue text-background shadow-lg shadow-accent-blue/20 hover:brightness-110',
+        secondary: 'border border-border bg-surface text-text hover:border-accent-blue/40 hover:bg-surface/90',
+        outline: 'border border-border text-accent-blue hover:border-accent-blue/40 hover:bg-accent-blue/10',
+        ghost: 'text-muted hover:bg-white/5 hover:text-text',
+        danger: 'bg-accent-red text-white shadow-lg shadow-accent-red/15 hover:brightness-110',
       },
       size: {
         sm: 'h-8 px-3 text-xs',

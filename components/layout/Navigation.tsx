@@ -12,7 +12,10 @@ export function Navigation({ onSelect }: NavigationProps) {
   const { activeTab, setActiveTab } = useAppStore();
 
   return (
-    <nav className="flex gap-1 overflow-x-auto scrollbar-thin md:gap-2" aria-label="Main navigation">
+    <nav
+      className="flex gap-1 overflow-x-auto rounded-full border border-border bg-surface/70 p-1 scrollbar-thin md:gap-2"
+      aria-label="Main navigation"
+    >
       {TABS.map((tab) => (
         <button
           key={tab.id}
@@ -21,16 +24,13 @@ export function Navigation({ onSelect }: NavigationProps) {
             onSelect?.();
           }}
           className={cn(
-            'relative whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+            'whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-colors',
             activeTab === tab.id
-              ? 'text-accent-blue'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'border-b-2 border-accent-blue text-accent-blue'
+              : 'border-b-2 border-transparent text-muted hover:text-text'
           )}
         >
           {tab.label}
-          {activeTab === tab.id && (
-            <span className="absolute bottom-0 left-1/2 h-0.5 w-3/4 -translate-x-1/2 rounded-full bg-accent-blue" />
-          )}
         </button>
       ))}
     </nav>

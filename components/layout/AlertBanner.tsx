@@ -36,10 +36,12 @@ export function AlertBanner() {
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: -100, opacity: 0 }}
       transition={{ type: 'spring', damping: 25 }}
-      className="relative overflow-hidden border-b border-accent-red/30 bg-gradient-to-r from-accent-red/20 via-accent-orange/20 to-accent-red/20 px-4 py-4"
+      className={`relative overflow-hidden border-b px-4 py-4 ${
+        isIntrusion ? 'border-accent-red bg-accent-red/15' : 'border-accent-green bg-accent-green/10'
+      }`}
     >
       <motion.div
-        className="absolute inset-0 bg-accent-red/5"
+        className={`absolute inset-0 ${isIntrusion ? 'bg-accent-red/10' : 'bg-accent-green/5'}`}
         animate={{ opacity: [0.3, 0.6, 0.3] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       />
@@ -48,17 +50,17 @@ export function AlertBanner() {
           {isIntrusion ? (
             <ShieldExclamationIcon className="h-8 w-8 shrink-0 text-accent-red" />
           ) : (
-            <ExclamationTriangleIcon className="h-8 w-8 shrink-0 text-accent-orange" />
+            <ExclamationTriangleIcon className="h-8 w-8 shrink-0 text-accent-green" />
           )}
           <div>
-            <p className="text-lg font-bold uppercase tracking-wide text-white">
+            <p className={`text-lg font-bold uppercase tracking-wide ${isIntrusion ? 'text-white' : 'text-accent-green'}`}>
               {isIntrusion ? 'Intrusion Detected' : alert.message}
             </p>
-            <p className="text-sm text-slate-300">
+            <p className="text-sm text-text">
               {isIntrusion && `Unauthorized entry detected — Zone: ${alert.location}`}
               {!isIntrusion && `${alert.location} · ${formatDateTime(alert.timestamp)}`}
             </p>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-muted">
               <span className={getConfidenceColor(alert.confidence)}>
                 {(alert.confidence * 100).toFixed(1)}% confidence
               </span>

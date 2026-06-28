@@ -4,14 +4,12 @@ import { useVitalsStore } from '@/lib/store';
 import { usePoseStore } from '@/lib/usePoseStore';
 import { useFallStore } from '@/lib/useFallStore';
 import { StatusCard } from '@/components/cards/StatusCard';
-import { ACTIVITY_LABELS } from '@/lib/constants';
-import { formatDuration, isBreathingNormal, isHeartRateNormal, formatTime } from '@/lib/utils';
+import { isBreathingNormal, isHeartRateNormal, formatTime } from '@/lib/utils';
 import {
   HeartIcon,
   UserIcon,
   UsersIcon,
   ShieldExclamationIcon,
-  BoltIcon,
 } from '@heroicons/react/24/outline';
 import {
   ComposedChart,
@@ -30,8 +28,6 @@ export function OverviewTab() {
   const {
     breathing,
     heartRate,
-    activity,
-    activityDuration,
     breathingHistory,
     heartRateHistory,
     personCount,
@@ -41,7 +37,7 @@ export function OverviewTab() {
   const { fallDetected, lastFallTimestamp, fallsToday, eventLog } = useFallStore();
 
   const vitalsStatus = isBreathingNormal(breathing) && isHeartRateNormal(heartRate) ? 'Normal' : 'Warning';
-  const vitalsColor = vitalsStatus === 'Normal' ? '#34d399' : '#fb923c';
+  const vitalsColor = vitalsStatus === 'Normal' ? '#00FF9D' : '#FFB020';
 
   // Combine data for timeline
   // We'll use breathing history as the base timeline since it updates regularly
@@ -65,7 +61,7 @@ export function OverviewTab() {
   return (
     <div className="space-y-6">
       {/* Summary Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 items-stretch">
         {/* Vitals Summary Card */}
         <StatusCard
           icon={<HeartIcon className="h-6 w-6 text-accent-blue" />}
@@ -96,15 +92,6 @@ export function OverviewTab() {
           statusVariant={fallDetected ? 'danger' : 'success'}
         />
 
-        {/* Activity Card */}
-        <StatusCard
-          icon={<BoltIcon className="h-6 w-6 text-accent-blue" />}
-          label="Current Activity"
-          value={ACTIVITY_LABELS[activity] || activity}
-          color="#60a5fa"
-          subtitle={`Duration: ${formatDuration(activityDuration)}`}
-        />
-
         {/* Occupancy Card */}
         <StatusCard
           icon={<UsersIcon className="h-6 w-6 text-accent-blue" />}
@@ -124,17 +111,17 @@ export function OverviewTab() {
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={combinedData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="time" stroke="#64748b" tick={{ fontSize: 10 }} />
-                <YAxis yAxisId="left" domain={[10, 30]} stroke="#60a5fa" tick={{ fontSize: 10 }} orientation="left" />
-                <YAxis yAxisId="right" domain={[50, 110]} stroke="#f87171" tick={{ fontSize: 10 }} orientation="right" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E2D45" />
+                <XAxis dataKey="time" stroke="#6B7FA3" tick={{ fontSize: 10 }} />
+                <YAxis yAxisId="left" domain={[10, 30]} stroke="#00D4FF" tick={{ fontSize: 10 }} orientation="left" />
+                <YAxis yAxisId="right" domain={[50, 110]} stroke="#FF4444" tick={{ fontSize: 10 }} orientation="right" />
                 <Tooltip
-                  contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+                  contentStyle={{ background: '#111827', border: '1px solid #1E2D45', borderRadius: '8px', color: '#F0F4FF' }}
                 />
                 <Legend />
-                <Line yAxisId="left" type="monotone" dataKey="breathing" name="Breathing (BPM)" stroke="#60a5fa" strokeWidth={2} dot={false} isAnimationActive={false} />
-                <Line yAxisId="right" type="monotone" dataKey="heartRate" name="Heart Rate (BPM)" stroke="#f87171" strokeWidth={2} dot={false} isAnimationActive={false} />
-                <Scatter yAxisId="left" dataKey="fall" name="Fall Events" fill="#ef4444" />
+                <Line yAxisId="left" type="monotone" dataKey="breathing" name="Breathing (BPM)" stroke="#00D4FF" strokeWidth={2} dot={false} isAnimationActive={false} />
+                <Line yAxisId="right" type="monotone" dataKey="heartRate" name="Heart Rate (BPM)" stroke="#FF4444" strokeWidth={2} dot={false} isAnimationActive={false} />
+                <Scatter yAxisId="left" dataKey="fall" name="Fall Events" fill="#FF4444" />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

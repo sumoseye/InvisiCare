@@ -22,7 +22,7 @@ export const WaveformChart = memo(function WaveformChart({ data }: WaveformChart
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-accent-green">CSI Waveform — Real-time Subcarrier Analysis</CardTitle>
+        <CardTitle className="text-text">CSI Waveform — Real-time Subcarrier Analysis</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-80">
@@ -30,27 +30,29 @@ export const WaveformChart = memo(function WaveformChart({ data }: WaveformChart
             <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#34d399" stopOpacity={0.5} />
-                  <stop offset="100%" stopColor="#34d399" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.45} />
+                  <stop offset="100%" stopColor="#00D4FF" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="index" stroke="#64748b" tick={{ fontSize: 10 }} />
-              <YAxis domain={[80, 120]} stroke="#64748b" tick={{ fontSize: 10 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#1E2D45" />
+              <XAxis dataKey="index" stroke="#6B7FA3" tick={{ fontSize: 10 }} />
+              <YAxis domain={[80, 120]} stroke="#6B7FA3" tick={{ fontSize: 10 }} />
               <Tooltip
                 contentStyle={{
-                  background: '#1e293b',
-                  border: '1px solid #334155',
+                  background: '#111827',
+                  border: '1px solid #1E2D45',
                   borderRadius: '8px',
+                  color: '#F0F4FF',
                 }}
               />
               <Area
                 type="monotone"
                 dataKey="value"
-                stroke="#34d399"
+                stroke="#00D4FF"
                 fill="url(#waveGrad)"
                 strokeWidth={2}
                 isAnimationActive={false}
+                style={{ filter: 'drop-shadow(0 0 10px rgba(0, 212, 255, 0.3))' }}
               />
             </AreaChart>
           </ResponsiveContainer>

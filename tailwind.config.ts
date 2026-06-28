@@ -9,13 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        dark: '#0f172a',
-        darker: '#1e293b',
-        'accent-blue': '#60a5fa',
-        'accent-purple': '#a78bfa',
-        'accent-green': '#34d399',
-        'accent-red': '#ef4444',
-        'accent-orange': '#fb923c',
+        dark: '#0A0F1E',
+        darker: '#111827',
+        surface: '#111827',
+        border: '#1E2D45',
+        text: '#F0F4FF',
+        muted: '#6B7FA3',
+        'accent-blue': '#00D4FF',
+        'accent-purple': '#00D4FF',
+        'accent-green': '#00FF9D',
+        'accent-red': '#FF4444',
+        'accent-orange': '#FFB020',
         background: 'var(--background)',
         foreground: 'var(--foreground)',
       },
@@ -27,7 +31,7 @@ const config: Config = {
         glow: 'glow 2s ease-in-out infinite',
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
       },
     },
   },

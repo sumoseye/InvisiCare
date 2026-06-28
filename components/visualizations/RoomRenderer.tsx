@@ -36,7 +36,7 @@ export function RoomRenderer({ people, showTrails = true }: RoomRendererProps) {
     try {
       // Scene setup
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0f172a);
+      scene.background = new THREE.Color(0x0a0f1e);
       sceneRef.current = scene;
 
       // Camera setup
@@ -135,7 +135,7 @@ export function RoomRenderer({ people, showTrails = true }: RoomRendererProps) {
     people.forEach((person) => {
       if (!peopleGroupsRef.current.has(person.personId)) {
         try {
-          const group = createPersonMesh(person.color || '#5a6b7a');
+          const group = createPersonMesh(person.color || '#00d4ff');
           group.position.set(
             person.position?.x || 0,
             person.position?.y || 0,
@@ -211,7 +211,7 @@ export function RoomRenderer({ people, showTrails = true }: RoomRendererProps) {
   return (
     <div
       ref={containerRef}
-      className="relative h-full min-h-[500px] w-full overflow-hidden rounded-xl border border-white/10 bg-slate-900/50"
+      className="relative h-full min-h-[500px] w-full overflow-hidden rounded-xl border border-border bg-background"
     />
   );
 }
@@ -220,14 +220,14 @@ export function RoomRenderer({ people, showTrails = true }: RoomRendererProps) {
 function createRoom(scene: THREE.Scene) {
   // Floor
   const floorGeometry = new THREE.PlaneGeometry(10, 8);
-  const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x1e293b });
+  const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x111827 });
   const floor = new THREE.Mesh(floorGeometry, floorMaterial);
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
   scene.add(floor);
 
   // Walls
-  const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x334155 });
+  const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x1e2d45 });
 
   // Back wall
   const backWallGeometry = new THREE.PlaneGeometry(10, 2.5);
@@ -260,7 +260,7 @@ function createRoom(scene: THREE.Scene) {
 
   // Sofa
   const sofaGeometry = new THREE.BoxGeometry(2.5, 1, 1);
-  const sofaMaterial = new THREE.MeshStandardMaterial({ color: 0x6b5b4a });
+  const sofaMaterial = new THREE.MeshStandardMaterial({ color: 0x334155 });
   const sofa = new THREE.Mesh(sofaGeometry, sofaMaterial);
   sofa.position.set(-2, 0.5, 1);
   sofa.castShadow = true;
@@ -269,7 +269,7 @@ function createRoom(scene: THREE.Scene) {
 
   // Bed
   const bedGeometry = new THREE.BoxGeometry(1.5, 0.8, 2);
-  const bedMaterial = new THREE.MeshStandardMaterial({ color: 0xf5f5f5 });
+  const bedMaterial = new THREE.MeshStandardMaterial({ color: 0x6b7fa3 });
   const bed = new THREE.Mesh(bedGeometry, bedMaterial);
   bed.position.set(3, 0.4, 1);
   bed.castShadow = true;
@@ -278,7 +278,7 @@ function createRoom(scene: THREE.Scene) {
 
   // Table
   const tableTopGeometry = new THREE.BoxGeometry(1.2, 0.05, 0.8);
-  const tableTopMaterial = new THREE.MeshStandardMaterial({ color: 0x8b7355 });
+  const tableTopMaterial = new THREE.MeshStandardMaterial({ color: 0x00d4ff });
   const tableTop = new THREE.Mesh(tableTopGeometry, tableTopMaterial);
   tableTop.position.set(0, 0.5, 0);
   tableTop.castShadow = true;
@@ -343,7 +343,7 @@ function createPersonMesh(color: string): THREE.Group {
 
   // Feet
   const footGeometry = new THREE.BoxGeometry(0.15, 0.1, 0.25);
-  const footMaterial = new THREE.MeshStandardMaterial({ color: 0x1e293b });
+  const footMaterial = new THREE.MeshStandardMaterial({ color: 0x0a0f1e });
   const leftFoot = new THREE.Mesh(footGeometry, footMaterial);
   leftFoot.position.set(-0.15, 0, 0);
   leftFoot.castShadow = true;

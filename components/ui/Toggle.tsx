@@ -20,20 +20,20 @@ export function Toggle({
 }: ToggleProps) {
   return (
     <div className="flex items-center gap-3">
-      {label && <span className="text-sm text-slate-400">{label}</span>}
+      {label && <span className="text-sm text-muted">{label}</span>}
       <button
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={cn(
           'relative h-8 w-16 rounded-full transition-colors duration-300',
-          checked ? 'bg-accent-green/30' : 'bg-slate-700'
+          checked ? 'bg-accent-green/20' : 'bg-border'
         )}
       >
         <motion.div
           className={cn(
             'absolute top-1 h-6 w-6 rounded-full shadow-md',
-            checked ? 'bg-accent-green' : 'bg-slate-400'
+            checked ? 'bg-accent-green' : 'bg-muted'
           )}
           animate={{ left: checked ? '2.25rem' : '0.25rem' }}
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
@@ -42,7 +42,7 @@ export function Toggle({
       <span
         className={cn(
           'text-sm font-semibold',
-          checked ? 'text-accent-green' : 'text-slate-400'
+          checked ? 'text-accent-green' : 'text-muted'
         )}
       >
         {checked ? activeLabel : inactiveLabel}

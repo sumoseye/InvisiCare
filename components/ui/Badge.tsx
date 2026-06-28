@@ -7,11 +7,11 @@ interface BadgeProps {
 }
 
 const variants = {
-  default: 'bg-white/10 text-slate-300 border-white/10',
-  success: 'bg-accent-green/10 text-accent-green border-accent-green/30',
-  warning: 'bg-accent-orange/10 text-accent-orange border-accent-orange/30',
-  danger: 'bg-accent-red/10 text-accent-red border-accent-red/30',
-  info: 'bg-accent-blue/10 text-accent-blue border-accent-blue/30',
+  default: 'bg-white/5 text-muted border-border',
+  success: 'bg-accent-green/15 text-accent-green border-accent-green/30',
+  warning: 'bg-accent-orange/15 text-accent-orange border-accent-orange/30',
+  danger: 'bg-accent-red/15 text-accent-red border-accent-red/30',
+  info: 'bg-accent-blue/15 text-accent-blue border-accent-blue/30',
 };
 
 export function Badge({ children, variant = 'default', className }: BadgeProps) {

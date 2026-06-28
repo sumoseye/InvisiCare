@@ -32,25 +32,25 @@ export function StatusCard({
   children,
 }: StatusCardProps) {
   return (
-    <motion.div whileHover={{ y: -4, transition: { duration: 0.2 } }}>
-      <Card className="relative overflow-hidden transition-shadow hover:shadow-lg hover:shadow-accent-blue/5">
+    <motion.div className="h-full" whileHover={{ y: -4, transition: { duration: 0.2 } }}>
+      <Card className="relative h-full overflow-hidden transition-shadow hover:shadow-[0_0_0_1px_rgba(0,212,255,0.4),0_4px_24px_rgba(0,212,255,0.08)]">
         <div
-          className="absolute inset-0 opacity-5"
+          className="absolute inset-0 opacity-10"
           style={{ background: `linear-gradient(135deg, ${color}, transparent)` }}
         />
-        <div className="relative space-y-3">
+        <div className="relative flex h-full flex-col justify-between gap-3">
           <div className="flex items-center justify-between">
             <span>{icon}</span>
             {status && <Badge variant={statusVariant}>{status}</Badge>}
           </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider text-slate-400">{label}</p>
-            <p className="text-3xl font-bold" style={{ color }}>
+          <div className="space-y-1">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted">{label}</p>
+            <p className="text-3xl font-bold text-accent-blue" style={{ textShadow: '0 0 18px rgba(0, 212, 255, 0.18)' }}>
               {value}
             </p>
-            {subtitle && <p className="mt-1 text-sm text-slate-400">{subtitle}</p>}
+            {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
             {confidence !== undefined && (
-              <p className="text-xs text-slate-500">{(confidence * 100).toFixed(1)}% confidence</p>
+              <p className="text-xs text-muted">{(confidence * 100).toFixed(1)}% confidence</p>
             )}
           </div>
           {trend && trend.length > 0 && (

@@ -3,15 +3,12 @@
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { TABS } from '@/lib/constants';
-import { useAppStore, useRoomStore } from '@/lib/store';
-import { Badge } from '../ui/Badge';
+import { useRoomStore } from '@/lib/store';
 import { Navigation } from './Navigation';
 
 export function Header() {
   const [time, setTime] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
-  const activeTab = useAppStore((s) => s.activeTab);
   const { selectedRoom, setSelectedRoom } = useRoomStore();
 
   useEffect(() => {
@@ -32,48 +29,43 @@ export function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-dark/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-6">
-        <div className="flex items-center gap-4">
-          <h1 className="text-lg font-bold lg:text-xl">
-            <span className="bg-gradient-to-r from-accent-blue via-accent-purple to-accent-green bg-clip-text text-transparent">
-              InvisiCare
-            </span>
-          </h1>
-          <div className="hidden items-center gap-2 md:flex">
-            <motion.div
-              className="h-2.5 w-2.5 rounded-full bg-accent-green"
-              animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <span className="text-xs text-accent-green">Live</span>
+    <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-6">
+        <div className="flex items-center justify-between gap-4 lg:justify-start">
+          <div>
+            <h1 className="text-lg font-bold tracking-tight text-text lg:text-xl">
+              <span className="bg-gradient-to-r from-accent-blue via-accent-green to-text bg-clip-text text-transparent">
+                InvisiCare
+              </span>
+            </h1>
+
           </div>
-        </div>
 
-        <div className="hidden lg:block">
-          <Navigation />
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="hidden text-xs text-slate-400 sm:block">{time}</span>
-          <Badge variant="success" className="hidden sm:inline-flex">
-            System Active
-          </Badge>
-          <select
-            value={selectedRoom}
-            onChange={(e) => setSelectedRoom(e.target.value)}
-            className="rounded-md border border-white/10 bg-dark/50 px-3 py-1.5 text-sm font-medium text-white shadow-sm focus:border-accent-blue focus:outline-none focus:ring-1 focus:ring-accent-blue sm:text-sm"
-          >
-            <option value="1">Room 1</option>
-            <option value="2">Room 2</option>
-          </select>
           <button
-            className="rounded-lg p-2 text-slate-400 hover:bg-white/5 lg:hidden"
+            className="rounded-lg p-2 text-muted hover:bg-white/5 hover:text-text lg:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
+        </div>
+
+        <div className="hidden lg:block lg:self-center">
+          <Navigation />
+        </div>
+
+        <div className="flex items-center gap-3 lg:justify-end">
+          <span className="hidden rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted sm:block">
+            {time}
+          </span>
+          <select
+            value={selectedRoom}
+            onChange={(e) => setSelectedRoom(e.target.value)}
+            className="rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text shadow-sm outline-none transition focus:border-accent-blue focus:ring-1 focus:ring-accent-blue"
+          >
+            <option value="1">Room 1</option>
+            <option value="2">Room 2</option>
+          </select>
         </div>
       </div>
 
@@ -81,22 +73,11 @@ export function Header() {
         <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
-          className="border-t border-white/10 px-4 py-3 lg:hidden"
+          className="border-t border-border px-4 py-3 lg:hidden"
         >
           <Navigation onSelect={() => setMobileOpen(false)} />
         </motion.div>
       )}
-
-      <div className="hidden h-0.5 bg-slate-800 lg:block">
-        <motion.div
-          className="h-full bg-gradient-to-r from-accent-blue to-accent-purple"
-          layout
-          style={{
-            width: `${(TABS.findIndex((t) => t.id === activeTab) + 1) * (100 / TABS.length)}%`,
-          }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        />
-      </div>
     </header>
   );
 }

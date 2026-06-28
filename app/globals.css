@@ -3,8 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
+  --background: #0a0f1e;
+  --foreground: #f0f4ff;
+  --surface: #111827;
+  --border: #1e2d45;
+  --text-muted: #6b7fa3;
 }
 
 * {
@@ -19,16 +22,21 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  background-image:
+    radial-gradient(circle at top, rgba(0, 212, 255, 0.1), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 28%),
+    linear-gradient(180deg, #0a0f1e 0%, #0a0f1e 100%);
 }
 
 @layer utilities {
   .glass-card {
-    @apply bg-white/5 backdrop-blur-md border border-white/10;
+    @apply border border-border bg-surface/95 backdrop-blur-md;
+    box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.08), 0 4px 24px rgba(0, 212, 255, 0.04);
   }
 
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #334155 transparent;
+    scrollbar-color: #1e2d45 transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -41,17 +49,17 @@ body {
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #1e2d45;
     border-radius: 3px;
   }
 }
 
 @keyframes glow {
   0%, 100% {
-    box-shadow: 0 0 5px rgba(96, 165, 250, 0.2);
+    box-shadow: 0 0 5px rgba(0, 212, 255, 0.18);
   }
   50% {
-    box-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.28);
   }
 }
 
@@ -67,4 +75,9 @@ body {
 
 button, a, input, select {
   transition-duration: 0.15s;
+}
+
+::selection {
+  background: rgba(0, 212, 255, 0.25);
+  color: var(--foreground);
 }

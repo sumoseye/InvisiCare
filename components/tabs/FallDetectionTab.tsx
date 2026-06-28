@@ -46,8 +46,8 @@ export function FallDetectionTab() {
       {/* Alert Banner */}
       <div className={`p-4 rounded-xl border flex items-center gap-4 shadow-lg ${
         fallDetected 
-          ? 'bg-accent-red/20 border-accent-red/50 shadow-accent-red/20 animate-pulse' 
-          : 'bg-accent-green/10 border-accent-green/30 shadow-accent-green/5'
+          ? 'bg-accent-red/15 border-accent-red/60 shadow-[0_0_0_1px_rgba(255,68,68,0.25)] animate-pulse' 
+          : 'bg-accent-green/10 border-accent-green/40 shadow-[0_0_0_1px_rgba(0,255,157,0.16)]'
       }`}>
         {fallDetected ? (
           <ExclamationTriangleIcon className="h-8 w-8 text-accent-red" />
@@ -58,7 +58,7 @@ export function FallDetectionTab() {
           <h2 className={`text-xl font-bold ${fallDetected ? 'text-accent-red' : 'text-accent-green'}`}>
             {fallDetected ? `FALL DETECTED — ${formatTime(lastFallTimestamp || Date.now())}` : 'No Falls Detected'}
           </h2>
-          <p className="text-sm text-slate-400">
+          <p className={`text-sm ${fallDetected ? 'text-white' : 'text-accent-green'}`}>
             {fallDetected ? 'Immediate assistance may be required.' : 'Monitoring zones actively.'}
           </p>
         </div>
@@ -68,26 +68,26 @@ export function FallDetectionTab() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6 text-center">
-            <p className="text-sm text-slate-400 mb-2">Falls Today</p>
-            <p className="text-3xl font-bold text-white">{fallsToday}</p>
+            <p className="mb-2 text-sm text-muted">Falls Today</p>
+            <p className="text-3xl font-bold text-text">{fallsToday}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6 text-center">
-            <p className="text-sm text-slate-400 mb-2">Falls This Week</p>
-            <p className="text-3xl font-bold text-white">{fallsThisWeek}</p>
+            <p className="mb-2 text-sm text-muted">Falls This Week</p>
+            <p className="text-3xl font-bold text-text">{fallsThisWeek}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6 text-center">
-            <p className="text-sm text-slate-400 mb-2">Last Incident</p>
-            <p className="text-3xl font-bold text-white">{lastFallTimestamp ? formatTime(lastFallTimestamp) : 'None'}</p>
+            <p className="mb-2 text-sm text-muted">Last Incident</p>
+            <p className="text-3xl font-bold text-text">{lastFallTimestamp ? formatTime(lastFallTimestamp) : 'None'}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6 text-center">
-            <p className="text-sm text-slate-400 mb-2">Avg Recovery</p>
-            <p className="text-3xl font-bold text-white">{formatDuration(Math.round(avgRecoveryTime))}</p>
+            <p className="mb-2 text-sm text-muted">Avg Recovery</p>
+            <p className="text-3xl font-bold text-text">{formatDuration(Math.round(avgRecoveryTime))}</p>
           </CardContent>
         </Card>
       </div>
@@ -105,19 +105,19 @@ export function FallDetectionTab() {
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#00D4FF" stopOpacity={0.7}/>
+                        <stop offset="95%" stopColor="#00D4FF" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="index" stroke="#64748b" tick={false} />
-                    <YAxis domain={[0, 200]} stroke="#64748b" tick={{ fontSize: 10 }} />
-                    <Tooltip contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px' }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1E2D45" />
+                    <XAxis dataKey="index" stroke="#6B7FA3" tick={false} />
+                    <YAxis domain={[0, 200]} stroke="#6B7FA3" tick={{ fontSize: 10 }} />
+                    <Tooltip contentStyle={{ background: '#111827', border: '1px solid #1E2D45', borderRadius: '8px', color: '#F0F4FF' }} />
                     
                     {/* Highlight the fall area if detected (mock logic: last 10 points) */}
-                    {fallDetected && <ReferenceArea x1={chartData.length - 10} x2={chartData.length - 1} fill="#ef4444" fillOpacity={0.2} />}
+                    {fallDetected && <ReferenceArea x1={chartData.length - 10} x2={chartData.length - 1} fill="#FF4444" fillOpacity={0.15} />}
                     
-                    <Area type="monotone" dataKey="value" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorValue)" isAnimationActive={false} />
+                    <Area type="monotone" dataKey="value" stroke="#00D4FF" fillOpacity={1} fill="url(#colorValue)" isAnimationActive={false} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -132,7 +132,7 @@ export function FallDetectionTab() {
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-slate-400">
-                  <thead className="border-b border-white/10 bg-slate-900/50 text-xs uppercase text-slate-500">
+                  <thead className="border-b border-border bg-surface/70 text-xs uppercase text-muted">
                     <tr>
                       <th className="px-4 py-3">Time</th>
                       <th className="px-4 py-3">Location</th>
@@ -144,11 +144,11 @@ export function FallDetectionTab() {
                   </thead>
                   <tbody>
                     {eventLog.length > 0 ? eventLog.map((event) => (
-                      <tr key={event.id} className="border-b border-white/5 hover:bg-white/5">
-                        <td className="px-4 py-3 text-white">{formatTime(event.timestamp)}</td>
+                      <tr key={event.id} className="border-b border-border hover:bg-white/5">
+                        <td className="px-4 py-3 text-text">{formatTime(event.timestamp)}</td>
                         <td className="px-4 py-3">{event.location}</td>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded text-xs ${event.severity === 'major' ? 'bg-accent-red/20 text-accent-red' : 'bg-yellow-400/20 text-yellow-400'}`}>
+                          <span className={`px-2 py-1 rounded text-xs ${event.severity === 'major' ? 'bg-accent-red/20 text-accent-red' : 'bg-accent-orange/15 text-accent-orange'}`}>
                             {event.severity}
                           </span>
                         </td>
@@ -168,7 +168,7 @@ export function FallDetectionTab() {
                       </tr>
                     )) : (
                       <tr>
-                        <td colSpan={6} className="px-4 py-8 text-center text-slate-500">No fall events recorded.</td>
+                        <td colSpan={6} className="px-4 py-8 text-center text-muted">No fall events recorded.</td>
                       </tr>
                     )}
                   </tbody>
@@ -186,16 +186,16 @@ export function FallDetectionTab() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <h4 className="text-sm font-medium text-slate-300 mb-3">Sensitivity</h4>
+                <h4 className="mb-3 text-sm font-medium text-text">Sensitivity</h4>
                 <Slider 
                   value={settings.sensitivity} 
                   onChange={(val) => updateSettings({ sensitivity: val })} 
                 />
-                <p className="text-xs text-slate-500 mt-2">Higher sensitivity detects minor falls but may cause more false alarms.</p>
+                <p className="mt-2 text-xs text-muted">Higher sensitivity detects minor falls but may cause more false alarms.</p>
               </div>
 
-              <div className="pt-4 border-t border-white/10">
-                <h4 className="text-sm font-medium text-slate-300 mb-3">Alert Notifications</h4>
+              <div className="border-t border-border pt-4">
+                <h4 className="mb-3 text-sm font-medium text-text">Alert Notifications</h4>
                 <Toggle 
                   checked={settings.notificationsEnabled} 
                   onChange={(val) => updateSettings({ notificationsEnabled: val })}
@@ -204,14 +204,14 @@ export function FallDetectionTab() {
                 />
               </div>
 
-              <div className="pt-4 border-t border-white/10">
-                <h4 className="text-sm font-medium text-slate-300 mb-3">Monitored Zones</h4>
+              {/* <div className="border-t border-border pt-4">
+                <h4 className="mb-3 text-sm font-medium text-text">Monitored Zones</h4>
                 <div className="space-y-2">
                   {['Living Room', 'Bedroom', 'Kitchen', 'Bathroom'].map(zone => (
-                    <label key={zone} className="flex items-center gap-3 text-sm text-slate-400 cursor-pointer hover:text-white">
+                    <label key={zone} className="flex cursor-pointer items-center gap-3 text-sm text-muted hover:text-text">
                       <input 
                         type="checkbox" 
-                        className="rounded border-white/20 bg-slate-800 text-accent-blue focus:ring-accent-blue"
+                        className="rounded border-border bg-surface text-accent-blue focus:ring-accent-blue"
                         checked={settings.zones.includes(zone)}
                         onChange={(e) => {
                           const newZones = e.target.checked 
@@ -224,7 +224,7 @@ export function FallDetectionTab() {
                     </label>
                   ))}
                 </div>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         </div>
