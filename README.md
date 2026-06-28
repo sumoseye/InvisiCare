@@ -1,118 +1,150 @@
-# InvisiCare
+# InvisiCare — WiFi Health Monitor
+Contactless, real-time health monitoring using WiFi CSI signals — tracking vitals, body pose, and fall detection without wearables or cameras.
 
-A production-grade, full-stack WiFi-based spatial sensing dashboard built with Next.js 14. Monitor vital signs, track human pose, detect intrusions, and analyze occupancy patterns — all simulated through WiFi CSI (Channel State Information) signal analysis.
+---
 
-![InvisiCare](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?style=flat-square&logo=tailwindcss)
+## Screenshots
+
+
+
+### Overview
+![Overview Tab](./public/screenshots/Overview.png)
+
+### Vitals
+![Vitals Tab](./public/screenshots/Vitals.png)
+
+### Pose Detection
+![Pose Detection Tab](./public/screenshots/Pose.png)
+
+### Fall Detection
+![Fall Detection Tab](./public/screenshots/Falls.png)
+
+---
 
 ## Features
 
-- **Real-time Dashboard** — Breathing rate, heart rate, occupancy, and CSI waveform visualization
-- **Pose Tracking** — 3D room with procedural furniture, animated humanoid figures, movement trails, per-person vitals panel
-- **Intrusion Detection** — 3D intruder visualization, floor plan with multi-person dots, enhanced alert history
-- **Analytics** — Vital sign trends, occupancy patterns, activity breakdown, fall risk assessment
-- **Event Log** — Filterable event feed with CSV export and webhook configuration
-- **Glassmorphism UI** — Dark professional theme with Framer Motion animations
+- **Vital Signs** — Contactless breathing rate and heart rate monitoring via CSI bandpass filtering
+- **Pose Detection** — Real-time 3D skeleton visualization with 17-keypoint body tracking
+- **Fall Detection** — Automated fall alerts with event logging and caregiver notifications
+- **Multi-Room Support** — Switch between monitored rooms from the dashboard header
+- **Edge Processing** — All inference runs on-device with no cloud dependency
+
+---
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 14 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS |
-| State | Zustand |
-| Charts | Recharts, Chart.js |
-| Animation | Framer Motion + Three.js |
-| 3D Graphics | Three.js (procedural room, humanoid, path trails) |
-| Icons | Heroicons (no emoji in UI labels) |
-| Database | PostgreSQL + Prisma (optional) |
+**Hardware**
+- ESP32-S3
+
+**Frontend**
+- Next.js, Tailwind CSS, Zustand, Recharts, Three.js
+
+**Backend**
+- FastAPI, Python, PostgreSQL
+
+**AI / Signal Processing**
+- Rust, RuVector, PyTorch, Hugging Face
+
+**Communication**
+- WebSocket, MQTT
+
+**DevOps**
+- Docker, PyO3
+
+---
 
 ## Getting Started
 
 ### Prerequisites
-
 - Node.js 18+
-- npm or yarn
+- Python 3.10+
+- Docker (optional)
+- ESP32-S3 hardware node (optional — mock data available)
 
 ### Installation
 
 ```bash
-git clone <your-repo-url>
-cd invisicare
+# Clone the repository
+git clone https://github.com/sumoseye/InvisiCare.git
+cd InvisiCare
+
+# Install frontend dependencies
+cd dashboard
 npm install
+
+# Install backend dependencies
+pip install -r requirements.txt
 ```
 
-### Development
+### Running the Dashboard
 
 ```bash
+# Start the backend
+uvicorn main:app --reload --port 8000
+
+# Start the frontend
+cd dashboard
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Production Build
+### Running with Docker
 
 ```bash
-npm run build
-npm start
+docker compose up
 ```
 
-## Environment Variables
+### Running without Hardware (Mock Mode)
 
-Create a `.env.local` file (optional — app works without database):
+The dashboard runs with simulated data when no ESP32 node is connected. Mock data is enabled by default when the hardware API is unreachable.
 
-```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
-DATABASE_URL=postgresql://user:password@localhost:5432/wifisense
+---
+
+## System Architecture
+
+```
+ESP32-S3 Node
+     │
+     ▼ (MQTT / WebSocket)
+Sensing Server (FastAPI)
+     │
+     ├── PostgreSQL (historical data)
+     │
+     ▼
+API Routes (/api/vitals, /api/waveform, /api/pose, /api/falls)
+     │
+     ▼
+Next.js Dashboard
+     ├── Overview Tab
+     ├── Vitals Tab
+     ├── Pose Detection Tab
+     └── Fall Detection Tab
 ```
 
-### Database Setup (Optional)
+---
 
-```bash
-npx prisma generate
-npx prisma db push
-```
+## How It Works
 
-## API Routes
+1. An ESP32-S3 node captures Channel State Information (CSI) from ambient WiFi signals across 56 subcarriers
+2. Raw CSI is processed through a Rust-based signal pipeline to extract breathing rate, heart rate, and motion features
+3. A pretrained AI model maps the cleaned features to vital signs, 17-keypoint body pose, and fall events
+4. Processed data is served via FastAPI and visualized in real time on the Next.js dashboard
 
-| Endpoint | Description | Update Rate |
-|----------|-------------|-------------|
-| `GET /api/vitals` | Current vital signs | 1s |
-| `GET /api/skeleton` | Skeleton pose data | 100ms |
-| `GET /api/waveform` | CSI waveform (50 points) | 500ms |
-| `GET /api/events` | Event log with filters | 2s |
-| `GET /api/zones` | Zone status data | 1s |
+---
 
 ## Project Structure
 
 ```
-invisicare/
-├── app/                  # Next.js App Router pages & API routes
-├── components/
-│   ├── layout/           # Header, Navigation, AlertBanner
-│   ├── tabs/             # Dashboard, Pose, Intrusion, Analytics, Events
-│   ├── charts/           # Recharts visualizations
-│   ├── visualizations/   # Skeleton, FloorPlan
-│   ├── cards/            # StatusCard, ZoneCard, EventCard
-│   └── ui/               # Button, Card, Toggle, Slider, Dialog
-├── lib/
-│   ├── simulators/       # Backend data simulators
-│   ├── store.ts          # Zustand stores
-│   ├── types.ts          # TypeScript definitions
-│   └── utils.ts          # Utility functions
-└── prisma/               # Database schema
+InvisiCare/
+├── dashboard/          # Next.js frontend
+│   ├── components/     # UI components
+│   ├── lib/            # Stores, utils, constants
+│   └── app/            # App router pages
+├── firmware/           # ESP32-S3 firmware
+├── python/             # Signal processing pipeline
+├── docker/             # Docker configuration
+└── docs/               # Documentation
 ```
 
-## Deployment
-
-Deploy to [Vercel](https://vercel.com) with zero configuration:
-
-1. Push to GitHub
-2. Import project in Vercel
-3. Deploy
-
-## License
-
-MIT
+---
